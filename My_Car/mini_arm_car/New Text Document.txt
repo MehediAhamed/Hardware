@@ -1,0 +1,215 @@
+#include "Motor.h"
+#include "sbus.h"
+#include <Servo.h>
+
+#define SBUS_PIN A6
+
+Motor motor_Right(A1, A2);
+Motor motor_Left(A3, A4);
+
+int rEna=A0;
+int lEna=A5;
+float pwm=255;
+
+
+
+
+//arm
+
+
+Servo myservo1; 
+Servo myservo2; 
+Servo myservo3;
+
+ 
+Servo myservo4; 
+Servo myservo5; 
+Servo myservo6;
+
+
+float fixed_servo5_axis=90;
+int fixed_servo5_pin= 12;
+
+float fixed_servo6_axis=0;
+int fixed_servo6_pin= 13;
+
+
+float pot1;
+float pot2;
+float pot3;
+float pot4;
+float pot5;
+float pot6;
+float pot1Filtered;
+float pot2Filtered;
+float pot3Filtered;
+float pot4Filtered;
+float pot5Filtered;
+float pot6Filtered;
+int axis1Diff;
+int axis2Diff;
+int axis3Diff;
+
+int servoL;
+int servoR;
+
+
+SBUS sbus;
+
+void setup() {
+  Serial.begin(9600);
+  sbus.begin(SBUS_PIN, sbusNonBlocking);
+
+  pinMode(rEna,OUTPUT);
+  pinMode(lEna,OUTPUT);
+
+  analogWrite(rEna,pwm);
+  analogWrite(lEna,pwm);
+
+
+  //arm
+  myservo1.attach(10);   // waist
+  myservo2.attach(9);   // left hand  
+  myservo3.attach(8);   // right hand
+
+
+
+  
+  pinMode(A8, INPUT);   // demand
+  pinMode(A9, INPUT);   // waist axis
+  pinMode(A10, INPUT);   // demand
+  pinMode(A11, INPUT);   // shoulder axis
+  pinMode(A12, INPUT);   // demand
+  pinMode(A13, INPUT);   // elbow axis
+
+
+  //Servo 5
+  myservo5.attach(11);
+  myservo5.write(90);
+    //Servo 6
+  myservo6.attach(12);
+  myservo6.write(0);
+
+  
+  
+  
+}
+
+void loop() {
+//    for (int i = 1; i <= 10; i ++) {
+//      Serial.print(sbus.getChannel(i));
+//      Serial.print(' ');
+//    }
+  int xvel = sbus.getChannel(2) + 7;
+  int zvel = sbus.getChannel(1) - 3;
+
+//  Serial.print(xvel);
+//  Serial.print(' ');
+//  Serial.println(zvel);
+
+  if (xvel < 1000 || zvel < 1000) {
+    xvel = 1500;
+    zvel = 1500;
+  }
+
+  if (abs(xvel - 1500) < 100) {
+    xvel = 1500;
+  }
+
+  if (abs(zvel - 1500) < 100) {
+    zvel = 1500;
+  }
+
+//  Serial.print(xvel);
+//  Serial.print(' ');
+//  Serial.println(zvel);
+
+  xvel = map(xvel, 2000, 1000, -1000, 1000);
+  zvel = map(zvel, 1000, 2000, -1000, 1000);
+
+  Serial.print(xvel);
+  Serial.print(' ');
+  Serial.println(zvel);
+
+
+  motor_Right.setSpeed(xvel - zvel);
+  motor_Left.setSpeed(xvel + zvel);
+
+//  Serial.print(xvel-zvel);
+//  Serial.print(' ');
+//  Serial.println(xvel+zvel);
+ 
+
+
+
+ //arm
+  pot1 = analogRead(A0);        // waist demand
+  pot2 = analogRead(A1);        // waist axis position
+
+  pot3 = analogRead(A2);        // shoulder demand
+  pot4 = analogRead(A3);        // shoulder axis position
+
+  pot5 = analogRead(A4);        // elbow demand
+  pot6 = analogRead(A5);        // elbow axis position
+ 
+  pot1 = map(pot1,0,1023,-512,512);         // scale pots - waist
+  pot2 = map(pot2,0,1023,-512,512);
+
+  pot3 = map(pot3,0,1023,-512,512);         // scale pots - shoulder
+  pot4 = map(pot4,0,1023,-512,512);
+
+  pot5 = map(pot5,0,1023,-512,512);         // scale pots - elbow
+  pot6 = map(pot6,0,1023,-512,512);
+
+  pot1Filtered = filter(pot1, pot1Filtered, 15);    // filter for noise
+  pot2Filtered = filter(pot2, pot2Filtered, 15);
+
+  pot3Filtered = filter(pot3, pot3Filtered, 15);    // filter for noise
+  pot4Filtered = filter(pot4, pot4Filtered, 15);
+
+  pot5Filtered = filter(pot5, pot5Filtered, 15);    // filter for noise
+  pot6Filtered = filter(pot6, pot6Filtered, 15);
+  
+  axis1Diff = (pot2Filtered-pot1Filtered)*-3;       // work out the difference and scale up for more gain
+  axis2Diff = (pot4Filtered-pot3Filtered)*-2;       // work out the difference and scale up for more gain
+  axis3Diff = (pot6Filtered-pot5Filtered)*-2;       // work out the difference and scale up for more gain
+
+  servoL = axis2Diff - axis3Diff;
+  servoR = axis2Diff + axis3Diff;
+
+  axis1Diff = map(axis1Diff,-512,512,800,2400);     // scale outout for driving servos
+  axis1Diff = constrain(axis1Diff,800,2400);        // constrain output so we keep to the physical limits of the servo
+
+  servoL = map(servoL,-512,512,800,2400);     // scale outout for driving servos
+  servoL = constrain(servoL,800,2400);        // constrain output so we keep to the physical limits of the servo
+
+  servoR = map(servoR,-512,512,800,2400);     // scale outout for driving servos
+  servoR = constrain(servoR,800,2400);        // constrain output so we keep to the physical limits of the servo
+
+//  Serial.print(axis2Diff);
+//  Serial.print(" , ");
+//
+//  Serial.print(axis3Diff);
+//  Serial.print(" , ");
+//
+//  Serial.print(servoL);
+//  Serial.print(" , ");
+//  Serial.println(servoR);
+
+  myservo1.writeMicroseconds(axis1Diff);             // drive servo
+  myservo2.writeMicroseconds(servoL);             // drive servo LEFT
+  myservo3.writeMicroseconds(servoR);             // drive servo RIGHT
+
+  //delay(10);
+
+
+  delay(10);
+}
+
+
+// motion filter to filter noise from pots
+
+float filter(float prevValue, float currentValue, int filter) {  
+  float lengthFiltered =  (prevValue + (currentValue * filter)) / (filter + 1);  
+  return lengthFiltered;  
+}

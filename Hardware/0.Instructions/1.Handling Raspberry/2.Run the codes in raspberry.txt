@@ -1,0 +1,20 @@
+# After login into raspberry, do login from 3 terminal
+
+# In 1 terminal type-
+    
+    roscore
+
+# In other start teleopkey keyboard-
+
+    rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+
+
+# Type ls and cd to go inside directory.
+
+# Type ./filename.sh to start .sh file
+
+# Arduino should be connected to receive signal
+
+#lauch ros
+
+roslaunch roslaunch example.launch

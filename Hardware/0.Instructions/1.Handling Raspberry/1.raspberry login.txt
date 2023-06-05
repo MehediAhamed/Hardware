@@ -1,0 +1,14 @@
+#connect pc and raspberry in the same mobile hotspot
+
+ #hotspot name - anirban22
+ #password- anirban22
+
+#Go to linux terminal and type the command
+
+ssh ubuntu@192.168.99.176
+
+
+Now give password- rover22
+
+
+#In the above command 'ubuntu' is the name of raspberry pi, and rest is hotspot ip address

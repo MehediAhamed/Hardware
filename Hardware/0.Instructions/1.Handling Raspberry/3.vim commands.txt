@@ -1,0 +1,18 @@
+Make folder in linux-  mkdir foldername
+
+
+#open/create file-    vim test1.txt
+
+:w save changes in file
+
+:wq save and exit from file
+
+:x save and exit from file
+
+:q! exit without saving
+
+i is used to insert
+
+Press y to copy. Press d to cut.
+Move the cursor to where you want to paste your selection. 
+Press P (uppercase) to paste before your cursor.

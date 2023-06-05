@@ -1,0 +1,90 @@
+                          ---Install---
+
+sudo apt install software-properties-common
+sudo add-apt-repository universe
+sudo apt update && sudo apt install curl
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+sudo apt update
+sudo apt upgrade
+sudo apt install ros-humble-desktop
+sudo apt install ros-dev-tools
+source /opt/ros/humble/setup.bash
+
+--Then you need to open ./bashrc using gedit--
+
+source /opt/ros/humble/setup.bash
+ros2
+gedit ~/.bashrc
+
+--At the last line copy paste (source /opt/ros/humble/setup.bash) and save it
+
+---Run example
+ros2 run demo_nodes_cpp talker
+
+ros2 run demo_nodes_py listener
+
+                          ---
+                          ---
+
+              ---Create Ros2 workspace---
+
+sudo apt install python3-colcon-common-extensions
+gedit ~/.bashrc
+At last line add (source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash)
+and save it
+
+---Workspace
+mkdir <foldername>
+cd <foldername>
+mkdir src
+colcon build
+
+-now do ls and in install directory you can find setup.bash
+-now go to home
+
+cd
+source ~/<foldername>/install/setup.bash
+gedit ~./bashrc
+-Add in last line(source ~/<foldername>/install/setup.bash)
+
+                            ---Create Package---
+
+go to src folder of workspace
+
+For python package--
+ros2 pkg create my_robot_controller --build-type ament_python --dependencies rclpy
+For cpp package--
+ros2 pkg create my_robot_controller --build-type ament_cmake --dependencies rclcpp	
+
+-now go to workspace example - ros2_ws
+colcon build
+
+                                --- ---
+                                --- ---
+                          ---Create Node---
+
+Go to ros2_ws/src/my_robot_controller/my_robot_controller
+touch my_first_node.py
+
+-Make executable
+chmod +x my_first_node.py
+
+Now write subscriber or publisher node in the file, colcon build, ros2 run <nodefilename>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

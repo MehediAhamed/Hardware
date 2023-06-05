@@ -1,0 +1,10 @@
+Use cat compile.sh to see the commands
+
+1. arduino-cli compile -v --fqbn arduino:avr:uno rover_motor_sbus/
+
+
+Use ls /dev/tty* or ls /dev/ttyACM* or ls /dev/ttyUSB* to see in which port the arduino is connected
+
+
+2. arduino-cli upload -v -p /dev/ttyUSB0 --fqbn arduino:avr:uno rover_motor_sbus/
+
