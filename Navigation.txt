@@ -1,0 +1,9 @@
+This year, a monocular camera will be used for taking live feed. A 3D map construction will be done using ORB-SLAM.
+Path plotting and 2D mapping will be used for real time localization. Odometer and IMU will be used for 
+better accuracy.
+
+
+
+
+video feed from on board monocular camera, AR tag detection using AR track ALVAR,IMU data visualization, Point cloud visualization,
+localization,path plotting, 2D mapping, 3D mapping using RTAB-Map
